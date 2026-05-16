@@ -1,0 +1,15 @@
+[package]
+name = "secret-mask"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.74"
+description = "Mask known secret patterns (API keys, JWTs, AWS access keys, GitHub tokens) in log lines before they reach stdout/files/sinks. Zero deps."
+authors = ["Mukunda Rao Katta <mukunda.vjcs6@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/MukundaKatta/secret-mask"
+homepage = "https://github.com/MukundaKatta/secret-mask"
+documentation = "https://docs.rs/secret-mask"
+readme = "README.md"
+keywords = ["secret", "mask", "logging", "security", "redact"]
+categories = ["text-processing"]
+exclude = [".github/*", "target/*"]
