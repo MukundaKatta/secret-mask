@@ -48,15 +48,10 @@ pub fn mask(s: &str) -> String {
 
 /// True when `s` contains any secret pattern.
 pub fn has_secret(s: &str) -> bool {
-    let bytes = s.as_bytes();
-    let mut i = 0;
-    while i < bytes.len() {
-        if match_secret(s, i).is_some() {
-            return true;
-        }
-        i += 1;
-    }
-    false
+    // Walk by char boundaries so `match_secret`'s `&s[i..]` slice is always
+    // valid; advancing by raw bytes can land inside a multi-byte UTF-8
+    // character and panic.
+    s.char_indices().any(|(i, _)| match_secret(s, i).is_some())
 }
 
 fn match_secret(s: &str, i: usize) -> Option<usize> {
@@ -65,7 +60,14 @@ fn match_secret(s: &str, i: usize) -> Option<usize> {
 
     // Prefixed API keys (sk-, sk_live_, etc.) — greedy alnum/_/-
     let prefixes: &[&str] = &[
-        "sk-", "sk_live_", "sk_test_", "rk_live_", "ghp_", "github_pat_", "xoxb-", "xoxp-",
+        "sk-",
+        "sk_live_",
+        "sk_test_",
+        "rk_live_",
+        "ghp_",
+        "github_pat_",
+        "xoxb-",
+        "xoxp-",
     ];
     for p in prefixes {
         if rest.starts_with(p) {
@@ -86,7 +88,10 @@ fn match_secret(s: &str, i: usize) -> Option<usize> {
         let after = i + 4;
         if after + 16 <= bytes.len() {
             let tail = &bytes[after..after + 16];
-            if tail.iter().all(|c| c.is_ascii_uppercase() || c.is_ascii_digit()) {
+            if tail
+                .iter()
+                .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit())
+            {
                 return Some(after + 16);
             }
         }
